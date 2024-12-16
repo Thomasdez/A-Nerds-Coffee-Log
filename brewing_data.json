@@ -1,0 +1,161 @@
+{
+    "coffee_beans": {
+        "prolog|aponte honey": {
+            "coffee": {
+                "producer": "Prolog",
+                "name": "Aponte Honey",
+                "country": "Colombia",
+                "method": "Honey",
+                "grind_size": "corse"
+            },
+            "brews": [
+                {
+                    "pour_times": [
+                        {
+                            "weight": 50,
+                            "time": 3
+                        },
+                        {
+                            "weight": 100,
+                            "time": 4
+                        },
+                        {
+                            "weight": 100,
+                            "time": 5
+                        }
+                    ],
+                    "notes": "Really nice",
+                    "rating": 87
+                },
+                {
+                    "pour_times": [
+                        {
+                            "weight": 40,
+                            "time": 2
+                        },
+                        {
+                            "weight": 100,
+                            "time": 3
+                        }
+                    ],
+                    "notes": "SHould have used more water",
+                    "rating": 25
+                }
+            ]
+        },
+        "a|b": {
+            "coffee": {
+                "producer": "a",
+                "name": "b",
+                "country": "c",
+                "method": "d",
+                "grind_size": "e"
+            },
+            "brews": [
+                {
+                    "pour_times": [
+                        {
+                            "weight": 50,
+                            "time": 7
+                        },
+                        {
+                            "weight": 30,
+                            "time": 2
+                        }
+                    ],
+                    "notes": "yaaaaas queen",
+                    "rating": 69
+                },
+                {
+                    "pour_times": [
+                        {
+                            "weight": 2,
+                            "time": 3
+                        },
+                        {
+                            "weight": 2,
+                            "time": 2
+                        }
+                    ],
+                    "notes": "poor",
+                    "rating": 5
+                }
+            ]
+        },
+        "coffee colective|bekele": {
+            "coffee": {
+                "producer": "Coffee Colective",
+                "name": "Bekele",
+                "country": "Etheopia",
+                "method": "Natural",
+                "grind_size": "Corse"
+            },
+            "brews": [
+                {
+                    "pour_times": [
+                        {
+                            "weight": 60,
+                            "time": 3
+                        },
+                        {
+                            "weight": 20,
+                            "time": 4
+                        }
+                    ],
+                    "notes": "Best brew so far",
+                    "rating": 89
+                }
+            ]
+        },
+        "hart|j\u00f8rgen": {
+            "coffee": {
+                "producer": "Hart",
+                "name": "J\u00f8rgen",
+                "country": "Denmark",
+                "method": "Washed",
+                "grind_size": "Medium"
+            },
+            "brews": [
+                {
+                    "pour_times": [
+                        {
+                            "weight": 4,
+                            "time": 2
+                        },
+                        {
+                            "weight": 5,
+                            "time": 5
+                        },
+                        {
+                            "weight": 10,
+                            "time": 7
+                        }
+                    ],
+                    "notes": "very bad",
+                    "rating": 7
+                }
+            ]
+        },
+        "t|e": {
+            "coffee": {
+                "producer": "t",
+                "name": "e",
+                "country": "d",
+                "method": "s",
+                "grind_size": "f"
+            },
+            "brews": [
+                {
+                    "pour_times": [
+                        {
+                            "weight": 1,
+                            "time": 3
+                        }
+                    ],
+                    "notes": "hu 7",
+                    "rating": 6
+                }
+            ]
+        }
+    }
+}
