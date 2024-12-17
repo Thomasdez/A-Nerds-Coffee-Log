@@ -2,20 +2,7 @@ import time
 import json
 import os
 import threading
-import subprocess
-import sys
 
-"""
-The system uses keyboard shortkeys in the UI. Therfore the following try exceot statement is used
-to check id keyboard is installed, and installs thourgh pip if it is not
-"""
-
-try:
-    import keyboard
-except ImportError:
-    print("The 'keyboard' module is not installed. Installing it now...")
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "keyboard"])
-    import keyboard
 
 class Coffee:
     """
@@ -192,87 +179,55 @@ class DataStorage:
         key = f"{producer.lower()}|{name.lower()}"
         return self.coffees.get(key, None)
 
+
 def brew_timer():
     """
-    Tracks and displays real-time total elapsed time since the brewing process started.
-    Resets the elapsed time for each pour when the user presses Enter, and logs the time taken for each pour.
+    Tracks and displays total elapsed time and current pour time.
+    Users can press Enter to log a pour and type 'done' to finish.
+    The timer continuously updates without interfering with input.
     """
-    print("\nStarting the brew timer. Total elapsed time and time for each pour will be displayed.")
-    print("Press Enter each time you finish a pour. Type 'done' when finished with all pours.")
 
-    pours = []  # List to store the elapsed time for each pour
-    start_time = time.time()  # Total brew start time
-    last_pour_time = start_time  # Time when the last pour started
-    stop_timer = False  # Flag to stop the timer thread
+    print("\nStarting the brew timer. Press Enter to record a pour or type 'd' to finish.")
+    print("Total elapsed time and current pour time will be displayed.\n")
+
+    pours = []  # List to store elapsed times for pours
+    start_time = time.time()
+    last_pour_time = start_time
+    stop_timer = False
 
     def display_timer():
         """Continuously display the total elapsed time."""
         while not stop_timer:
             total_elapsed = int(time.time() - start_time)
             pour_elapsed = int(time.time() - last_pour_time)
-            print(f"\rTotal elapsed time: {total_elapsed} seconds | Current pour time: {pour_elapsed} seconds", end="", flush=True)
+            print(f"\rTotal elapsed time: {total_elapsed} seconds | Current pour time: {pour_elapsed} seconds", end="    ", flush=True)
             time.sleep(1)
 
-    # Start the timer thread
+    # Start the timer display thread
     timer_thread = threading.Thread(target=display_timer)
     timer_thread.daemon = True
     timer_thread.start()
 
+    # Input loop to log pours or finish
+    # For future development this loop should be improved. However, i am out of time, and this makes the program run so i will stick to it
     while True:
-        user_input = input("\nPress Enter to record a pour or type 'done' if finished: ").strip().lower()
-        if user_input == "done":
-            break
-        pour_elapsed = int(time.time() - last_pour_time)  # Time elapsed since the last pour
-        pours.append(pour_elapsed)
-        last_pour_time = time.time()  # Reset the last pour time
-        print(f"Pour recorded: {pour_elapsed} seconds.")
-
-def brew_timer():
-    """
-    Tracks and displays real-time total elapsed time since the brewing process started.
-    Resets the elapsed time for each pour when the user presses Space, and logs the time taken for each pour.
-    Press Enter to finish the brewing process.
-    """
-    
-    print("\nStarting the brew timer. Press Space to record a pour and Enter to finish.")
-    print("Total elapsed time and time for each pour will be displayed.")
-
-    pours = []  # List to store the elapsed time for each pour
-    start_time = time.time()  # Total brew start time
-    last_pour_time = start_time  # Time when the last pour started
-    stop_timer = False  # Flag to stop the timer thread
-    brewing_done = False  # Flag to indicate when brewing is complete
-
-    def display_timer():
-        """Continuously display the total elapsed time."""
-        while not stop_timer:
-            total_elapsed = int(time.time() - start_time)
-            pour_elapsed = int(time.time() - last_pour_time)
-            print(f"\rTotal elapsed time: {total_elapsed} seconds | Current pour time: {pour_elapsed} seconds", end="", flush=True)
-            time.sleep(1)
-
-    # Start the timer thread
-    timer_thread = threading.Thread(target=display_timer)
-    timer_thread.daemon = True
-    timer_thread.start()
-
-    print("\nPress Space to record a pour or Enter to finish.")
-    while not brewing_done:
-        if keyboard.is_pressed('space'):
-            # Log the elapsed time for the pour
+        print()  # Move input below timer display
+        user_input = input("Press Enter to log a pour or type 'd' to finish: ").strip().lower()
+        if user_input == "":
             pour_elapsed = int(time.time() - last_pour_time)
             pours.append(pour_elapsed)
-            last_pour_time = time.time()  # Reset the last pour time
-            print(f"\nPour recorded: {pour_elapsed} seconds.")
-            time.sleep(0.2)  # Prevent multiple detections of the same keypress
-
-        if keyboard.is_pressed('enter'):
-            brewing_done = True
+            last_pour_time = time.time()
+            print(f"Pour recorded: {pour_elapsed} seconds.")
+        elif user_input == "d":
             break
 
-    # Stop the timer thread
+    # Stop the timer
     stop_timer = True
     timer_thread.join()
+
+    # Log the final pour
+    final_pour_elapsed = int(time.time() - last_pour_time)
+    pours.append(final_pour_elapsed)
 
     total_brewing_time = int(time.time() - start_time)
     print("\nBrewing session completed.")
@@ -280,16 +235,19 @@ def brew_timer():
     print("Pour timings:", pours)
     return pours
 
+
+#Main function that runs the script
 def main():
     storage = DataStorage()
-    print("Welcome to the Interactive Coffee Brewing Assistant!")
+    print("Welcome to A Nerd's Coffee Log!")
 
     while True:
         print("\nMenu:")
         print("1. Brew a new coffee")
         print("2. View all stored data")
         print("3. Search for a coffee by producer and name")
-        print("4. Exit")
+        print("4. Ranking")
+        print("5. Exit")
         choice = input("Enter your choice: ").strip()
 
         if choice == "1":
@@ -305,6 +263,11 @@ def main():
             # Start the brew timer and record pours
             session = BrewSession()
             pours = brew_timer()
+
+            # Give a small prompt and wait before asking for the weights
+            print("\nNow you will be asked to enter the weight of water for each recorded pour.")
+            input("Please enter the weight of water for each pour")
+
             for i, pour_time in enumerate(pours, start=1):
                 while True:
                     weight_str = input(f"Enter the weight of water for pour {i} (in grams): ").strip()
@@ -379,11 +342,73 @@ def main():
                                 print(f"      - Weight: {pour['weight']}g, Time: {pour['time']}s")
 
         elif choice == "4":
+            # Ranking
+            print("\nWhat ranking would you like to see?")
+            print("1. Producers")
+            print("2. Coffee Bean Names")
+            print("3. Countries")
+            print("4. Production Methods")
+            rank_choice = input("Enter your choice: ").strip()
+
+            # Prepare data structures to hold sums and counts
+            category_sums = {}
+            category_counts = {}
+
+            # Depending on the user's choice, we'll pick the attribute from coffee beans
+            attr = None
+            if rank_choice == "1":
+                attr = "producer"
+            elif rank_choice == "2":
+                attr = "name"
+            elif rank_choice == "3":
+                attr = "country"
+            elif rank_choice == "4":
+                attr = "method"
+            else:
+                print("Invalid choice. Returning to main menu.")
+                continue
+
+            # Compute sums and counts of ratings by the chosen category
+            for key, coffee_bean in storage.coffees.items():
+                # Get attribute value
+                category_value = getattr(coffee_bean, attr, None)
+                if category_value is None:
+                    continue
+
+                # Collect all ratings from brew sessions
+                for brew in coffee_bean.brew_sessions:
+                    if category_value not in category_sums:
+                        category_sums[category_value] = 0
+                        category_counts[category_value] = 0
+                    category_sums[category_value] += brew.rating
+                    category_counts[category_value] += 1
+
+            # Compute averages
+            averages = []
+            for cat_val, total in category_sums.items():
+                count = category_counts[cat_val]
+                if count > 0:
+                    avg = total / count
+                    averages.append((cat_val, avg))
+
+            # Sort by average descending
+            averages.sort(key=lambda x: x[1], reverse=True)
+
+            # Display results with numbering
+            if not averages:
+                print("No brew sessions recorded, or no data available for this category.")
+            else:
+                print(f"\nRanking by {attr.capitalize()}:")
+                for i, (cat_val, avg) in enumerate(averages, start=1):
+                    print(f"{i}. {cat_val}: {avg:.2f}")
+
+        elif choice == "5":
             print("Goodbye! Enjoy your coffee!")
             break
 
         else:
             print("Invalid choice. Please try again.")
+
 
 if __name__ == "__main__":
     main()
